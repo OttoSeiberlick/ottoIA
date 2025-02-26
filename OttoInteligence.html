@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Agente de Inteligência Artificial do Otto</title>
+    <!-- Ícone da aba (favicon) -->
+    <link rel="icon" type="image/png" href="https://img.icons8.com/?size=32&id=61066&format=png">
+    <style>
+        body {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f8f9fa;
+        }
+        .container {
+            text-align: center;
+            max-width: 500px;
+            width: 90%;
+            padding: 30px;
+            background-color: white;
+            border-radius: 15px;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+        }
+        .star-icon {
+            font-size: 60px;
+            margin-bottom: 15px;
+            color: #ff9500;
+        }
+        h1 {
+            font-size: 26px;
+            color: #333;
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+        .subtitle {
+            font-size: 16px;
+            color: #666;
+            margin-bottom: 25px;
+            font-style: italic;
+        }
+        .search-box {
+            display: flex;
+            align-items: center;
+            background-color: white;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            padding: 8px 15px;
+            width: 100%;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
+            margin: 0 auto;
+        }
+        input {
+            border: none;
+            outline: none;
+            font-size: 16px;
+            width: 100%;
+            background: transparent;
+            padding: 8px 0;
+        }
+        button {
+            margin-left: 10px;
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #000;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            transition: background-color 0.2s;
+        }
+        button:hover {
+            background-color: #333;
+        }
+        #result {
+            margin-top: 25px;
+            font-size: 18px;
+            color: #333;
+            padding: 15px;
+            background-color: #f9f9f9;
+            border-radius: 10px;
+            border-left: 4px solid #ff9500;
+        }
+        .search-icon {
+            margin-right: 8px;
+            display: flex;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="star-icon">⭐</div>
+        <h1>Agente de Inteligência Artificial do Otto</h1>
+        <div class="subtitle">Powered by Aethon 3.7</div>
+        <div class="search-box">
+            <input type="text" placeholder="Faça sua pesquisa aqui..." id="searchInput">
+            <button id="searchButton">
+                <span class="search-icon">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="white" viewBox="0 0 16 16">
+                        <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+                    </svg>
+                </span>
+                Pesquisar
+            </button>
+        </div>
+        <div id="result"></div>
+    </div>
+
+    <script>
+        // Mapa de letras para sons (memes, Rodrigo Faro e animais)
+        const sounds = {
+            'a': new Audio('https://www.myinstants.com/media/sounds/bem-te-vi.mp3'), // Bem-te-vi
+            'b': new Audio('https://www.myinstants.com/media/sounds/cavalo-rodrigo-faro.mp3'), // Cavalo
+            'c': new Audio('https://www.myinstants.com/media/sounds/tome-rodrigo-faro.mp3'), // Tome
+            'd': new Audio('https://www.myinstants.com/media/sounds/que-isso-meu-filho-calma-rodrigo-faro.mp3'), // Que isso meu filho calma
+            'e': new Audio('https://www.myinstants.com/media/sounds/pare-rodrigo-faro.mp3'), // Pare!
+            'f': new Audio('https://www.myinstants.com/media/sounds/ui-rodrigo-faro.mp3'), // Ui
+            'g': new Audio('https://www.myinstants.com/media/sounds/ele-gosta.mp3'), // Ele gosta
+            'h': new Audio('https://www.myinstants.com/media/sounds/demaals.mp3'), // Demais
+            'i': new Audio('https://www.myinstants.com/media/sounds/chega-rodrigo-faro.mp3'), // Chega
+            'j': new Audio('https://www.myinstants.com/media/sounds/aiaiai-rodrigo-faro.mp3'), // Aiaiai
+            'k': new Audio('https://www.myinstants.com/media/sounds/e-brincadeira-hein-rodrigo-faro.mp3'), // É brincadeira hein
+            'l': new Audio('https://www.myinstants.com/media/sounds/ai-mamae-rodrigo-faro.mp3'), // Ai mamãe
+            'm': new Audio('https://www.myinstants.com/media/sounds/som-inentendivel-rodrigo-faro.mp3'), // Som ininteligível
+            'n': new Audio('https://www.myinstants.com/media/sounds/nao-rodrigo-faro.mp3'), // Não
+            'o': new Audio('https://www.myinstants.com/media/sounds/awawa.mp3'), // Awawa (capivara)
+            'p': new Audio('https://www.myinstants.com/media/sounds/lobinho.mp3'), // Lobinho
+            'q': new Audio('https://www.myinstants.com/media/sounds/que-cara-mais-sem-graca-rodrigo-faro.mp3'), // Que cara mais sem graça
+            'r': new Audio('https://www.myinstants.com/media/sounds/sheep.mp3'), // Som de ovelha (atualizado)
+            's': new Audio('https://www.myinstants.com/media/sounds/cow-moo.mp3'), // Vaca
+            't': new Audio('https://www.myinstants.com/media/sounds/happy-happy-happy.mp3'), // Happy happy happy
+            'u': new Audio('https://www.myinstants.com/media/sounds/cat-meow.mp3'), // Gato (miado)
+            'v': new Audio('https://www.myinstants.com/media/sounds/elephant.mp3'), // Som de elefante (atualizado)
+            'w': new Audio('https://www.myinstants.com/media/sounds/wolf.mp3'), // Lobo (uivo)
+            'x': new Audio('https://www.myinstants.com/media/sounds/duck-quack.mp3'), // Pato
+            'y': new Audio('https://www.myinstants.com/media/sounds/rooster.mp3'), // Galo
+            'z': new Audio('https://www.myinstants.com/media/sounds/lion-roar.mp3'), // Leão
+        };
+
+        const searchInput = document.getElementById('searchInput');
+        const searchButton = document.getElementById('searchButton');
+        const resultDiv = document.getElementById('result');
+
+        // Função para exibir e falar a passagem bíblica
+        function performSearch() {
+            const verse = "Assim diz o Senhor: 'Maldito o homem que confia no homem, e faz da carne o seu braço, e aparta o seu coração do Senhor!' (Jeremias 17:5)";
+            resultDiv.textContent = verse;
+
+            const utterance = new SpeechSynthesisUtterance(verse);
+            utterance.lang = 'pt-BR';
+            window.speechSynthesis.speak(utterance);
+        }
+
+        // Toca som ao digitar e pesquisa com Enter
+        searchInput.addEventListener('keydown', (event) => {
+            const key = event.key.toLowerCase();
+            if (sounds[key]) {
+                sounds[key].currentTime = 0;
+                sounds[key].play().catch(error => {
+                    console.log('Erro ao tocar o som:', error);
+                });
+            }
+            if (event.key === 'Enter') {
+                performSearch();
+            }
+        });
+
+        // Pesquisa ao clicar no botão
+        searchButton.addEventListener('click', performSearch);
+    </script>
+</body>
+</html>
